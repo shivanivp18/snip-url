@@ -10,6 +10,8 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
+from sqlalchemy.dialects import mysql
+
 
 # revision identifiers, used by Alembic.
 revision: str = '8329740f11c3'
@@ -25,7 +27,12 @@ def upgrade() -> None:
     sa.Column('id', sa.BigInteger(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('key_hash', sa.CHAR(length=64), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column(
+    'created_at',
+    sa.DateTime(),
+    server_default=sa.text('CURRENT_TIMESTAMP'),
+    nullable=False
+),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('key_hash')
     )
@@ -35,7 +42,12 @@ def upgrade() -> None:
     sa.Column('long_url', sa.String(length=2048), nullable=False),
     sa.Column('client_id', sa.BigInteger(), nullable=False),
     sa.Column('expires_at', sa.DateTime(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column(
+    'created_at',
+    sa.DateTime(),
+    server_default=sa.text('CURRENT_TIMESTAMP'),
+    nullable=False
+),
     sa.ForeignKeyConstraint(['client_id'], ['api_clients.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('code')
@@ -44,7 +56,11 @@ def upgrade() -> None:
     op.create_table('clicks',
     sa.Column('id', sa.BigInteger(), autoincrement=True, nullable=False),
     sa.Column('link_id', sa.BigInteger(), nullable=False),
-    sa.Column('clicked_at', sa.DateTime(), nullable=False),
+    sa.Column(
+    'clicked_at',
+    mysql.DATETIME(fsp=3),
+    nullable=False
+),
     sa.Column('referrer', sa.String(length=512), nullable=True),
     sa.Column('user_agent', sa.String(length=512), nullable=True),
     sa.Column('ip_hash', sa.CHAR(length=64), nullable=True),
